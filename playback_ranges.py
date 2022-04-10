@@ -80,6 +80,7 @@ class PLAYBACK_RANGES_OT_add(bpy.types.Operator):
     bl_idname = "playback_ranges.add"
     bl_label = "Add Playback Range"
     bl_description = "Add Playback Range"
+    bl_options = {"UNDO"}
 
     name:  bpy.props.StringProperty(name="Name", default="Action")  # type: ignore
     start: bpy.props.IntProperty(name="Start", default=0, options={"HIDDEN"})  # type: ignore
@@ -126,6 +127,7 @@ class PLAYBACK_RANGES_OT_delete(bpy.types.Operator):
     bl_idname = "playback_ranges.delete"
     bl_label = "Delete Playback Range"
     bl_description = "Delete Playback Range"
+    bl_options = {"UNDO"}
 
     index: bpy.props.IntProperty(name="Index")  # type: ignore
 
@@ -148,6 +150,7 @@ class PLAYBACK_RANGES_OT_move_up(bpy.types.Operator):
     bl_idname = "playback_ranges.move_up"
     bl_label = "Move Up"
     bl_description = ""
+    bl_options = {"UNDO"}
 
     shift_key_down = False
 
@@ -175,6 +178,7 @@ class PLAYBACK_RANGES_OT_move_down(bpy.types.Operator):
     bl_idname = "playback_ranges.move_down"
     bl_label = "Move Down"
     bl_description = ""
+    bl_options = {"UNDO"}
 
     shift_key_down = False
 
@@ -202,6 +206,7 @@ class PLAYBACK_RANGES_OT_edit_item(bpy.types.Operator):
     bl_idname = "playback_ranges.edit_item"
     bl_label = "Edit"
     bl_description = ""
+    bl_options = {"UNDO"}
 
     shift_key_down = False
 
@@ -251,6 +256,7 @@ class PLAYBACK_RANGES_OT_set_range(bpy.types.Operator):
     bl_idname = "playback_ranges.set_range"
     bl_label = "Set Playback Range"
     bl_description = "Set Playback Range"
+    bl_options = {"UNDO"}
 
     shift_key_down = False
 
