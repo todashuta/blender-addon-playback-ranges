@@ -208,8 +208,8 @@ class PLAYBACK_RANGES_OT_edit_item(bpy.types.Operator):
     index: bpy.props.IntProperty(name="Index", options={"HIDDEN"})  # type: ignore
 
     name:  bpy.props.StringProperty(name="Name")  # type: ignore
-    start: bpy.props.IntProperty(name="Start")  # type: ignore
-    end:   bpy.props.IntProperty(name="End")  # type: ignore
+    start: bpy.props.IntProperty(name="Start", min=0)  # type: ignore
+    end:   bpy.props.IntProperty(name="End", min=0)  # type: ignore
 
     @classmethod
     def poll(cls, context) -> bool:
@@ -285,8 +285,8 @@ class PLAYBACK_RANGES_OT_set_range(bpy.types.Operator):
 
 class PlaybackRangeItem(bpy.types.PropertyGroup):
     name:  bpy.props.StringProperty(name="Name", default="")  # type: ignore
-    start: bpy.props.IntProperty(name="Start", default=0)  # type: ignore
-    end:   bpy.props.IntProperty(name="End", default=0)  # type: ignore
+    start: bpy.props.IntProperty(name="Start", default=0, min=0)  # type: ignore
+    end:   bpy.props.IntProperty(name="End", default=0, min=0)  # type: ignore
 
 
 classes = (
