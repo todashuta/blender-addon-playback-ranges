@@ -112,6 +112,15 @@ class PLAYBACK_RANGES_OT_add(bpy.types.Operator):
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
 
+    def draw(self, context):
+        layout = self.layout
+        #row = layout.row()
+        #row.prop(self, "start")
+        #row.prop(self, "end")
+        #row.enabled = False
+        layout.label(text=f"Range: {self.start}-{self.end}")
+        layout.prop(self, "name")
+
 
 class PLAYBACK_RANGES_OT_delete(bpy.types.Operator):
     bl_idname = "playback_ranges.delete"
