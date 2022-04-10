@@ -141,6 +141,7 @@ class PLAYBACK_RANGES_OT_move_up(bpy.types.Operator):
     bl_description = ""
 
     shift_key_down = False
+
     index: bpy.props.IntProperty(name="Index")
 
     @classmethod
@@ -167,6 +168,7 @@ class PLAYBACK_RANGES_OT_move_down(bpy.types.Operator):
     bl_description = ""
 
     shift_key_down = False
+
     index: bpy.props.IntProperty(name="Index")
 
     @classmethod
@@ -230,6 +232,7 @@ class PLAYBACK_RANGES_OT_set_range(bpy.types.Operator):
     bl_description = "Set Playback Range"
 
     shift_key_down = False
+
     start: bpy.props.IntProperty(name="Start", default=-1)
     end:   bpy.props.IntProperty(name="End", default=-1)
 
