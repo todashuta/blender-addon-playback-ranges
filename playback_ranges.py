@@ -20,7 +20,7 @@
 bl_info = {
     "name": "Playback Ranges",
     "author": "todashuta",
-    "version": (1, 0, 1),
+    "version": (1, 0, 2),
     "blender": (2, 83, 0),
     "location": "3D View > Side Bar > Misc > Playback Ranges",
     "description": "",
