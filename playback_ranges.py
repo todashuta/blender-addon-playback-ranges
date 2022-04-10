@@ -194,11 +194,13 @@ class PLAYBACK_RANGES_OT_edit_item(bpy.types.Operator):
     bl_label = "Edit"
     bl_description = ""
 
+    shift_key_down = False
+
     index: bpy.props.IntProperty(name="Index", options={"HIDDEN"})
 
     name:  bpy.props.StringProperty(name="Name")
-    start: bpy.props.IntProperty(name="Start", options={"HIDDEN"})
-    end:   bpy.props.IntProperty(name="End", options={"HIDDEN"})
+    start: bpy.props.IntProperty(name="Start")
+    end:   bpy.props.IntProperty(name="End")
 
     @classmethod
     def poll(cls, context) -> bool:
@@ -217,6 +219,8 @@ class PLAYBACK_RANGES_OT_edit_item(bpy.types.Operator):
         return {"FINISHED"}
 
     def invoke(self, context, event):
+        self.shift_key_down = event.shift
+
         scene = context.scene
         item = scene.playback_ranges_items[self.index]
         self.name  = item.name
@@ -224,6 +228,14 @@ class PLAYBACK_RANGES_OT_edit_item(bpy.types.Operator):
         self.end   = item.end
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, "name")
+        if self.shift_key_down:
+            row = layout.row()
+            row.prop(self, "start")
+            row.prop(self, "end")
 
 
 class PLAYBACK_RANGES_OT_set_range(bpy.types.Operator):
