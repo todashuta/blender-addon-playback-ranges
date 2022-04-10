@@ -52,18 +52,16 @@ class PLAYBACK_RANGES_PT_panel(bpy.types.Panel):
 
         for idx,x in enumerate(scene.playback_ranges_items):
             split = layout.split(align=True, factor=0.7)
-            icon = "BLANK1"
+            depress = False
             if scene.use_preview_range:
                 if x.start == scene.frame_preview_start and x.end == scene.frame_preview_end:
-                    #split.alert = True
-                    icon = "CHECKMARK"
+                    depress = True
             else:
                 if x.start == scene.frame_start and x.end == scene.frame_end:
-                    #split.alert = True
-                    icon = "CHECKMARK"
+                    depress = True
             name = "" if x.name == "" else f"{x.name}: "
             text = name + (str(x.start) if x.start == x.end else f"{x.start}-{x.end}")
-            op = split.operator(PLAYBACK_RANGES_OT_set_range.bl_idname, text=text, icon=icon)
+            op = split.operator(PLAYBACK_RANGES_OT_set_range.bl_idname, text=text, depress=depress)
             op.start = x.start
             op.end   = x.end
             op = split.operator(PLAYBACK_RANGES_OT_edit_item.bl_idname, text="", icon="GREASEPENCIL")
