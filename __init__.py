@@ -48,6 +48,8 @@ class PLAYBACK_RANGES_PT_panel(bpy.types.Panel):
         scene = context.scene
         layout = self.layout
 
+        layout.operator(PLAYBACK_RANGES_OT_open_offline_help.bl_idname, icon="HELP")
+        layout.separator()
         layout.operator(PLAYBACK_RANGES_OT_add.bl_idname, icon="ADD")
 
         for idx,x in enumerate(scene.playback_ranges_items):
@@ -286,6 +288,23 @@ class PLAYBACK_RANGES_OT_set_range(bpy.types.Operator):
         return self.execute(context)
 
 
+class PLAYBACK_RANGES_OT_open_offline_help(bpy.types.Operator):
+    bl_idname = "playback_ranges.open_offline_help"
+    bl_label = "Open Offline Help"
+    bl_description = "Playback Ranges: Open Offline Help"
+    bl_options = {"INTERNAL"}
+
+
+    @classmethod
+    def poll(cls, context) -> bool:
+        return True
+
+    def execute(self, context):
+        from pathlib import Path
+        path = Path(__file__).resolve().parent / "docs" / "index.html"
+        return bpy.ops.wm.url_open(url=path.as_uri())
+
+
 class PlaybackRangeItem(bpy.types.PropertyGroup):
     name:  bpy.props.StringProperty(name="Name", default="")  # type: ignore
     start: bpy.props.IntProperty(name="Start", default=0, min=0)  # type: ignore
@@ -300,6 +319,8 @@ classes = (
         PLAYBACK_RANGES_OT_move_up,
         PLAYBACK_RANGES_OT_move_down,
         PLAYBACK_RANGES_OT_edit_item,
+
+        PLAYBACK_RANGES_OT_open_offline_help,
 
         PlaybackRangeItem,
 )
