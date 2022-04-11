@@ -109,7 +109,7 @@ class PLAYBACK_RANGES_OT_add(bpy.types.Operator):
             self.start = scene.frame_start
             self.end   = scene.frame_end
         wm = context.window_manager
-        return wm.invoke_props_dialog(self)
+        return wm.invoke_props_dialog(self, width=200)
 
     def draw(self, context):
         layout = self.layout
@@ -239,13 +239,13 @@ class PLAYBACK_RANGES_OT_edit_item(bpy.types.Operator):
         self.start = item.start
         self.end   = item.end
         wm = context.window_manager
-        return wm.invoke_props_dialog(self)
+        return wm.invoke_props_dialog(self, width=200)
 
     def draw(self, context):
         layout = self.layout
         layout.prop(self, "name")
         if self.shift_key_down:
-            row = layout.row()
+            row = layout.row(align=True)
             row.prop(self, "start")
             row.prop(self, "end")
 
