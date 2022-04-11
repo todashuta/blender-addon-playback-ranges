@@ -32,6 +32,24 @@ bl_info = {
 
 
 import bpy
+from typing import Tuple
+
+
+def get_range() -> Tuple[int, int]:
+    scene = bpy.context.scene
+    if scene.use_preview_range:
+        return (scene.frame_preview_start, scene.frame_preview_end)
+    return (scene.frame_start, scene.frame_end)
+
+
+def set_range(start, end):
+    scene = bpy.context.scene
+    if scene.use_preview_range:
+        scene.frame_preview_start = start
+        scene.frame_preview_end = end
+    else:
+        scene.frame_start = start
+        scene.frame_end = end
 
 
 class PLAYBACK_RANGES_PT_panel(bpy.types.Panel):
@@ -54,13 +72,7 @@ class PLAYBACK_RANGES_PT_panel(bpy.types.Panel):
 
         for idx,x in enumerate(scene.playback_ranges_items):
             split = layout.split(align=True, factor=0.7)
-            depress = False
-            if scene.use_preview_range:
-                if x.start == scene.frame_preview_start and x.end == scene.frame_preview_end:
-                    depress = True
-            else:
-                if x.start == scene.frame_start and x.end == scene.frame_end:
-                    depress = True
+            depress = (x.start, x.end) == get_range()
             name = "" if x.name == "" else f"{x.name}: "
             text = name + (str(x.start) if x.start == x.end else f"{x.start}-{x.end}")
             op = split.operator(PLAYBACK_RANGES_OT_set_range.bl_idname, text=text, depress=depress)
@@ -104,12 +116,7 @@ class PLAYBACK_RANGES_OT_add(bpy.types.Operator):
 
     def invoke(self, context, event):
         scene = context.scene
-        if scene.use_preview_range:
-            self.start = scene.frame_preview_start
-            self.end   = scene.frame_preview_end
-        else:
-            self.start = scene.frame_start
-            self.end   = scene.frame_end
+        self.start, self.end = get_range()
         wm = context.window_manager
         return wm.invoke_props_dialog(self, width=200)
 
@@ -271,12 +278,7 @@ class PLAYBACK_RANGES_OT_set_range(bpy.types.Operator):
             return {"CANCELLED"}
 
         scene = context.scene
-        if scene.use_preview_range:
-            scene.frame_preview_start = self.start
-            scene.frame_preview_end   = self.end
-        else:
-            scene.frame_start = self.start
-            scene.frame_end   = self.end
+        set_range(self.start, self.end)
 
         if self.shift_key_down:
             scene.frame_current = self.start
