@@ -244,10 +244,9 @@ class PLAYBACK_RANGES_OT_edit_item(bpy.types.Operator):
     def draw(self, context):
         layout = self.layout
         layout.prop(self, "name")
-        if self.shift_key_down:
-            row = layout.row(align=True)
-            row.prop(self, "start")
-            row.prop(self, "end")
+        row = layout.row(align=True)
+        row.prop(self, "start")
+        row.prop(self, "end")
 
 
 class PLAYBACK_RANGES_OT_set_range(bpy.types.Operator):
