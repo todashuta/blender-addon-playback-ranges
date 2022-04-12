@@ -95,8 +95,8 @@ class PLAYBACK_RANGES_OT_add(bpy.types.Operator):
     bl_options = {"UNDO"}
 
     name:  bpy.props.StringProperty(name="Name", default="Action")  # type: ignore
-    start: bpy.props.IntProperty(name="Start", default=0, options={"HIDDEN"})  # type: ignore
-    end:   bpy.props.IntProperty(name="End", default=0, options={"HIDDEN"})  # type: ignore
+    start: bpy.props.IntProperty(name="Start", default=0, min=0)  # type: ignore
+    end:   bpy.props.IntProperty(name="End", default=0, min=0)  # type: ignore
 
     @classmethod
     def poll(cls, context) -> bool:
@@ -122,11 +122,10 @@ class PLAYBACK_RANGES_OT_add(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
-        #row = layout.row()
-        #row.prop(self, "start")
-        #row.prop(self, "end")
-        #row.enabled = False
-        layout.label(text=f"Range: {self.start}-{self.end}")
+        row = layout.row(align=True)
+        row.prop(self, "start")
+        row.prop(self, "end")
+        #layout.label(text=f"Range: {self.start}-{self.end}")
         layout.prop(self, "name")
 
 
