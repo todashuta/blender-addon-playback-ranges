@@ -296,7 +296,6 @@ class PLAYBACK_RANGES_OT_open_offline_help(bpy.types.Operator):
     bl_description = "Playback Ranges: Open Offline Help"
     bl_options = {"INTERNAL"}
 
-
     @classmethod
     def poll(cls, context) -> bool:
         return True
