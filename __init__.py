@@ -105,6 +105,10 @@ class PLAYBACK_RANGES_OT_add(bpy.types.Operator):
         return True
 
     def execute(self, context):
+        if self.start > self.end:
+            self.report({"ERROR_INVALID_INPUT"}, "End must be grater than or equal to Start!")
+            return {"CANCELLED"}
+
         scene = context.scene
         item = scene.playback_ranges_items.add()
         item.name  = self.name
@@ -229,6 +233,10 @@ class PLAYBACK_RANGES_OT_edit_item(bpy.types.Operator):
         return True
 
     def execute(self, context):
+        if self.start > self.end:
+            self.report({"ERROR_INVALID_INPUT"}, "End must be grater than or equal to Start!")
+            return {"CANCELLED"}
+
         scene = context.scene
         item = scene.playback_ranges_items[self.index]
         item.name = self.name
