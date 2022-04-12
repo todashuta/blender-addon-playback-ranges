@@ -62,12 +62,14 @@ class PLAYBACK_RANGES_PT_panel(bpy.types.Panel):
     def poll(cls, context) -> bool:
         return True
 
+    def draw_header(self, context):
+        layout = self.layout
+        layout.operator(PLAYBACK_RANGES_OT_open_offline_help.bl_idname, icon="HELP", text="")
+
     def draw(self, context):
         scene = context.scene
         layout = self.layout
 
-        layout.operator(PLAYBACK_RANGES_OT_open_offline_help.bl_idname, icon="HELP")
-        layout.separator()
         layout.operator(PLAYBACK_RANGES_OT_add.bl_idname, icon="ADD")
 
         for idx,x in enumerate(scene.playback_ranges_items):
