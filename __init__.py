@@ -314,6 +314,10 @@ class PLAYBACK_RANGES_OT_open_offline_help(bpy.types.Operator):
         path = Path(__file__).resolve().parent / "docs" / "index.html"
         return bpy.ops.wm.url_open(url=path.as_uri())
 
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_confirm(self, event)
+
 
 class PlaybackRangeItem(bpy.types.PropertyGroup):
     name:  bpy.props.StringProperty(name="Name", default="")  # type: ignore
