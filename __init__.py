@@ -252,10 +252,10 @@ class PLAYBACK_RANGES_OT_edit_item(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
-        layout.prop(self, "name")
         row = layout.row(align=True)
         row.prop(self, "start")
         row.prop(self, "end")
+        layout.prop(self, "name")
 
 
 class PLAYBACK_RANGES_OT_set_range(bpy.types.Operator):
