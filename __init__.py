@@ -72,9 +72,10 @@ class PLAYBACK_RANGES_PT_panel(bpy.types.Panel):
 
         layout.operator(PLAYBACK_RANGES_OT_add.bl_idname, icon="ADD")
 
+        current_range = get_range()
         for idx,x in enumerate(scene.playback_ranges_items):
             split = layout.split(align=True, factor=0.7)
-            depress = (x.start, x.end) == get_range()
+            depress = (x.start, x.end) == current_range
             name = "" if x.name == "" else f"{x.name}: "
             text = name + (str(x.start) if x.start == x.end else f"{x.start}-{x.end}")
             op = split.operator(PLAYBACK_RANGES_OT_set_range.bl_idname, text=text, depress=depress)
