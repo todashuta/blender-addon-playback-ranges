@@ -76,9 +76,7 @@ class PLAYBACK_RANGES_PT_panel(bpy.types.Panel):
         for idx,x in enumerate(scene.playback_ranges_items):
             split = layout.split(align=True, factor=0.7)
             depress = (x.start, x.end) == current_range
-            name = "" if x.name == "" else f"{x.name}: "
-            text = name + (str(x.start) if x.start == x.end else f"{x.start}-{x.end}")
-            op = split.operator(PLAYBACK_RANGES_OT_set_range.bl_idname, text=text, depress=depress)
+            op = split.operator(PLAYBACK_RANGES_OT_set_range.bl_idname, text=x.get_button_text(), depress=depress)
             op.start = x.start
             op.end   = x.end
             op = split.operator(PLAYBACK_RANGES_OT_edit_item.bl_idname, text="", icon="GREASEPENCIL")
@@ -324,6 +322,16 @@ class PlaybackRangeItem(bpy.types.PropertyGroup):
     name:  bpy.props.StringProperty(name="Name", default="")  # type: ignore
     start: bpy.props.IntProperty(name="Start", default=0, min=0)  # type: ignore
     end:   bpy.props.IntProperty(name="End", default=0, min=0)  # type: ignore
+
+    def get_button_text(self) -> str:
+        s = ""
+        if self.name != "":
+            s = self.name + ": "
+        if self.start == self.end:
+            s += str(self.start)
+        else:
+            s += str(self.start) + "-" + str(self.end)
+        return s
 
 
 classes = (
