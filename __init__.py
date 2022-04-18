@@ -128,6 +128,7 @@ class PLAYBACK_RANGES_OT_add(bpy.types.Operator):
     def draw(self, context):
         layout = self.layout
         row = layout.row(align=True)
+        row.alert = self.start > self.end
         row.prop(self, "start")
         row.prop(self, "end")
         #layout.label(text=f"Range: {self.start}-{self.end}")
@@ -261,6 +262,7 @@ class PLAYBACK_RANGES_OT_edit_item(bpy.types.Operator):
     def draw(self, context):
         layout = self.layout
         row = layout.row(align=True)
+        row.alert = self.start > self.end
         row.prop(self, "start")
         row.prop(self, "end")
         layout.prop(self, "name")
