@@ -20,7 +20,7 @@
 bl_info = {
     "name": "Playback Ranges",
     "author": "todashuta",
-    "version": (1, 0, 3),
+    "version": (1, 0, 4),
     "blender": (2, 83, 0),
     "location": "3D View > Side Bar > Misc > Playback Ranges",
     "description": "",
@@ -52,6 +52,10 @@ def set_range(start, end):
         scene.frame_end = end
 
 
+from pathlib import Path
+LOCAL_HELP_PATH = Path(__file__).resolve().parent / "docs" / "index.html"
+
+
 class PLAYBACK_RANGES_PT_panel(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -63,7 +67,9 @@ class PLAYBACK_RANGES_PT_panel(bpy.types.Panel):
         return True
 
     def draw_header(self, context):
+        #preferences = context.preferences.addons[__name__].preferences
         layout = self.layout
+        #if preferences.show_help_button:
         layout.operator(PLAYBACK_RANGES_OT_open_offline_help.bl_idname, icon="HELP", text="")
 
     def draw(self, context):
@@ -310,10 +316,12 @@ class PLAYBACK_RANGES_OT_open_offline_help(bpy.types.Operator):
     def poll(cls, context) -> bool:
         return True
 
+    @classmethod
+    def description(cls, context, properties):
+        return f"Open Offline Help.\n{LOCAL_HELP_PATH}"
+
     def execute(self, context):
-        from pathlib import Path
-        path = Path(__file__).resolve().parent / "docs" / "index.html"
-        return bpy.ops.wm.url_open(url=path.as_uri())
+        return bpy.ops.wm.url_open(url=LOCAL_HELP_PATH.as_uri())
 
     def invoke(self, context, event):
         wm = context.window_manager
@@ -336,6 +344,16 @@ class PlaybackRangeItem(bpy.types.PropertyGroup):
         return s
 
 
+#class PLAYBACK_RANGES_Preferences(bpy.types.AddonPreferences):
+#    bl_idname = __name__
+#
+#    show_help_button: bpy.props.BoolProperty(name="Show Help Button on Panel Header", default=True)  # type: ignore
+#
+#    def draw(self, context):
+#        layout = self.layout
+#        layout.prop(self, "show_help_button")
+
+
 classes = (
         PLAYBACK_RANGES_PT_panel,
         PLAYBACK_RANGES_OT_set_range,
@@ -348,6 +366,8 @@ classes = (
         PLAYBACK_RANGES_OT_open_offline_help,
 
         PlaybackRangeItem,
+
+        #PLAYBACK_RANGES_Preferences,
 )
 
 
