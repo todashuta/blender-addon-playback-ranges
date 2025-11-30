@@ -20,8 +20,8 @@
 bl_info = {
     "name": "Playback Ranges",
     "author": "todashuta",
-    "version": (1, 0, 4),
-    "blender": (2, 83, 0),
+    "version": (1, 0, 5),
+    "blender": (4, 2, 0),
     "location": "3D View > Side Bar > Misc > Playback Ranges",
     "description": "",
     "warning": "",
@@ -70,7 +70,7 @@ class PLAYBACK_RANGES_PT_panel(bpy.types.Panel):
         #preferences = context.preferences.addons[__name__].preferences
         layout = self.layout
         #if preferences.show_help_button:
-        layout.operator(PLAYBACK_RANGES_OT_open_offline_help.bl_idname, icon="HELP", text="")
+        #layout.operator(PLAYBACK_RANGES_OT_open_offline_help.bl_idname, icon="HELP", text="")
 
     def draw(self, context):
         scene = context.scene
