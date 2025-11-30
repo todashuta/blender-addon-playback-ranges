@@ -1,0 +1,21 @@
+[project]
+name = "blender-addon-playback-ranges"
+version = "1.0.5"
+description = "Playback Ranges Addon"
+readme = "README.md"
+requires-python = ">=3.11.7"
+dependencies = [
+    "bpy==4.2.15",
+    "pylsp-mypy>=0.7.0",
+    "python-lsp-server[all]>=1.13.2",
+    "sphinx>=8.2.3",
+    "sphinx-autobuild>=2025.8.25",
+    "sphinx-rtd-theme>=3.0.2",
+]
+
+[tool.uv.sources]
+bpy = {index = "download.blender.org"}
+
+[[tool.uv.index]]
+name = "download.blender.org"
+url = "https://download.blender.org/pypi/"
