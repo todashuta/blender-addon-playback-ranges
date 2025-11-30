@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Playback Ranges Addon'
-copyright = '2022, todashuta'
+copyright = '2025, todashuta'
 author = 'todashuta'
 
 
