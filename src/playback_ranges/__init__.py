@@ -17,20 +17,6 @@
 # ##### END GPL LICENSE BLOCK #####
 
 
-bl_info = {
-    "name": "Playback Ranges",
-    "author": "todashuta",
-    "version": (1, 0, 5),
-    "blender": (4, 2, 0),
-    "location": "3D View > Side Bar > Misc > Playback Ranges",
-    "description": "",
-    "warning": "",
-    "wiki_url": "",
-    "tracker_url": "",
-    "category": "Animation"
-}
-
-
 import bpy
 from typing import Tuple
 
@@ -344,14 +330,15 @@ class PlaybackRangeItem(bpy.types.PropertyGroup):
         return s
 
 
-#class PLAYBACK_RANGES_Preferences(bpy.types.AddonPreferences):
-#    bl_idname = __name__
-#
-#    show_help_button: bpy.props.BoolProperty(name="Show Help Button on Panel Header", default=True)  # type: ignore
-#
-#    def draw(self, context):
-#        layout = self.layout
-#        layout.prop(self, "show_help_button")
+class PLAYBACK_RANGES_Preferences(bpy.types.AddonPreferences):
+    bl_idname = __name__
+
+    #show_help_button: bpy.props.BoolProperty(name="Show Help Button on Panel Header", default=True)  # type: ignore
+
+    def draw(self, context):
+        layout = self.layout
+        #layout.prop(self, "show_help_button")
+        layout.label(text="Location: 3D View > Side Bar > Misc > Playback Ranges")
 
 
 classes = (
@@ -367,7 +354,7 @@ classes = (
 
         PlaybackRangeItem,
 
-        #PLAYBACK_RANGES_Preferences,
+        PLAYBACK_RANGES_Preferences,
 )
 
 
