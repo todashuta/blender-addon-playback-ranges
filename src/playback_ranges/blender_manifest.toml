@@ -1,11 +1,12 @@
 schema_version = "1.0.0"
 
 id = "playback_ranges"
-version = "1.0.5"
+version = "1.0.6"
 name = "Playback Ranges"
-tagline = "Playback Ranges"
+tagline = "Manage playback ranges"
 maintainer = "todashuta <toda.shuta@gmail.com>"
 type = "add-on"
+tags = ["Animation"]
 
 blender_version_min = "4.2.0"
 
