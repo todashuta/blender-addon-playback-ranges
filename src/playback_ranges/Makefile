@@ -1,4 +1,4 @@
-BLENDER_EXE = "/Applications/Blender/Blender 4.2 LTS.app/Contents/MacOS/Blender"
+BLENDER_EXE = "/Applications/Blender/Blender 4.5 LTS.app/Contents/MacOS/Blender"
 file ?=
 
 .PHONY: help build validate

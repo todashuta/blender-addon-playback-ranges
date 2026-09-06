@@ -10,7 +10,7 @@ if "%1" == "" (
 	goto EOF
 )
 
-set "BLENDER_EXE=blender-4.2.exe"
+set "BLENDER_EXE=blender-4.5.exe"
 where /q "%BLENDER_EXE%"
 if errorlevel 1 (
 	echo %BLENDER_EXE% not found!

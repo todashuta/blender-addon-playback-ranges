@@ -1,14 +1,14 @@
 schema_version = "1.0.0"
 
 id = "playback_ranges"
-version = "1.0.6"
+version = "1.0.7"
 name = "Playback Ranges"
 tagline = "Manage playback ranges"
 maintainer = "todashuta <toda.shuta@gmail.com>"
 type = "add-on"
 tags = ["Animation"]
 
-blender_version_min = "4.2.0"
+blender_version_min = "4.5.0"
 
 license = [
   "SPDX:GPL-3.0-or-later",
