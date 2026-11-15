@@ -23,3 +23,8 @@ dependencies = [
 #[[tool.uv.index]]
 #name = "download.blender.org"
 #url = "https://download.blender.org/pypi/"
+
+[tool.ruff.lint]
+# Blender の bl_options はクラス属性として定義するのが API の作法で、実行時に書き換えない。
+# RUF012（mutable default）はこのパターンを誤検知するため無視する。
+ignore = ["RUF012"]
