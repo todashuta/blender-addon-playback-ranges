@@ -37,15 +37,15 @@ from bpy.props import (
 )
 
 
-def get_range() -> tuple[int, int]:
-    scene: Scene = bpy.context.scene # type: ignore
+def get_range(context: Context) -> tuple[int, int]:
+    scene: Scene = context.scene  # type: ignore
     if scene.use_preview_range:
         return (scene.frame_preview_start, scene.frame_preview_end)
     return (scene.frame_start, scene.frame_end)
 
 
-def set_range(start: int, end: int):
-    scene: Scene = bpy.context.scene # type: ignore
+def set_range(context: Context, start: int, end: int):
+    scene: Scene = context.scene  # type: ignore
     if scene.use_preview_range:
         scene.frame_preview_start = start
         scene.frame_preview_end = end
@@ -80,7 +80,7 @@ class PLAYBACK_RANGES_PT_panel(Panel):
 
         layout.operator(PLAYBACK_RANGES_OT_add.bl_idname, icon="ADD")
 
-        current_range = get_range()
+        current_range = get_range(context)
         for idx,x in enumerate(scene.playback_ranges_items): # type: ignore
             split = layout.split(align=True, factor=0.7)
             depress = (x.start, x.end) == current_range
@@ -128,7 +128,7 @@ class PLAYBACK_RANGES_OT_add(Operator):
         return {"FINISHED"}
 
     def invoke(self, context: Context, event: Event):
-        self.start, self.end = get_range()
+        self.start, self.end = get_range(context)
         wm: WindowManager = context.window_manager # type: ignore
         return wm.invoke_props_dialog(self, width=200)
 
@@ -310,7 +310,7 @@ class PLAYBACK_RANGES_OT_set_range(Operator):
             return {"CANCELLED"}
 
         scene: Scene = context.scene # type: ignore
-        set_range(self.start, self.end)
+        set_range(context, self.start, self.end)
 
         if self.shift_key_down:
             scene.frame_current = self.start
