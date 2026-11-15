@@ -35,6 +35,11 @@ from bpy.types import (
     WindowManager,
 )
 
+# Blender のフレーム範囲は、通常の再生範囲が MINFRAME(0) 以上、
+# プレビュー範囲が MINAFRAME(-1048574) 以上と決まっている。
+# 負のプレビュー範囲も扱えるように、保存データの下限は MINAFRAME に合わせる。
+MIN_FRAME = -1048574
+
 
 def get_range(context: Context) -> tuple[int, int]:
     scene: Scene = context.scene  # type: ignore
@@ -110,8 +115,8 @@ class PLAYBACK_RANGES_OT_add(Operator):
     bl_options = {"UNDO"}
 
     name: StringProperty(name="Name", default="Action")  # type: ignore
-    start: IntProperty(name="Start", default=0, min=0)  # type: ignore
-    end: IntProperty(name="End", default=0, min=0)  # type: ignore
+    start: IntProperty(name="Start", default=0, min=MIN_FRAME)  # type: ignore
+    end: IntProperty(name="End", default=0, min=MIN_FRAME)  # type: ignore
 
     @classmethod
     def poll(cls, context: Context) -> bool:
@@ -249,8 +254,8 @@ class PLAYBACK_RANGES_OT_edit_item(Operator):
     index: IntProperty(name="Index", options={"HIDDEN"})  # type: ignore
 
     name: StringProperty(name="Name")  # type: ignore
-    start: IntProperty(name="Start", min=0)  # type: ignore
-    end: IntProperty(name="End", min=0)  # type: ignore
+    start: IntProperty(name="Start", min=MIN_FRAME)  # type: ignore
+    end: IntProperty(name="End", min=MIN_FRAME)  # type: ignore
 
     @classmethod
     def poll(cls, context: Context) -> bool:
@@ -308,15 +313,16 @@ class PLAYBACK_RANGES_OT_set_range(Operator):
 
     shift_key_down = False
 
-    start: IntProperty(name="Start", default=-1)  # type: ignore
-    end: IntProperty(name="End", default=-1)  # type: ignore
+    start: IntProperty(name="Start", default=MIN_FRAME - 1, options={"SKIP_SAVE"})  # type: ignore
+    end: IntProperty(name="End", default=MIN_FRAME - 1, options={"SKIP_SAVE"})  # type: ignore
 
     @classmethod
     def poll(cls, context: Context) -> bool:
         return True
 
     def execute(self, context: Context):
-        if self.start < 0 or self.end < 0:
+        # F3 から直接呼ばれたときは default のままなので、何もせずに終わる。
+        if self.start < MIN_FRAME or self.end < MIN_FRAME:
             return {"CANCELLED"}
 
         scene: Scene = context.scene  # type: ignore
@@ -356,8 +362,8 @@ class PLAYBACK_RANGES_OT_open_offline_help(Operator):
 
 class PlaybackRangeItem(PropertyGroup):
     name: StringProperty(name="Name", default="")  # type: ignore
-    start: IntProperty(name="Start", default=0, min=0)  # type: ignore
-    end: IntProperty(name="End", default=0, min=0)  # type: ignore
+    start: IntProperty(name="Start", default=0, min=MIN_FRAME)  # type: ignore
+    end: IntProperty(name="End", default=0, min=MIN_FRAME)  # type: ignore
 
     def get_button_text(self) -> str:
         s = ""
