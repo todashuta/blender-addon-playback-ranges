@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "playback_ranges"
-version = "1.0.7"
+version = "1.0.8"
 name = "Playback Ranges"
 tagline = "Manage playback ranges"
 maintainer = "todashuta <toda.shuta@gmail.com>"

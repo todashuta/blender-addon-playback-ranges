@@ -1,9 +1,9 @@
 # ##### BEGIN GPL LICENSE BLOCK #####
 #
-#  This program is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU General Public License
-#  as published by the Free Software Foundation; either version 2
-#  of the License, or (at your option) any later version.
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
 #
 #  This program is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -11,13 +11,17 @@
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software Foundation,
-#  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ##### END GPL LICENSE BLOCK #####
 
 
 import bpy
+from bpy.props import (
+    CollectionProperty,
+    IntProperty,
+    StringProperty,
+)
 from bpy.types import (
     AddonPreferences,
     Context,
@@ -30,23 +34,22 @@ from bpy.types import (
     UILayout,
     WindowManager,
 )
-from bpy.props import (
-    BoolProperty,
-    CollectionProperty,
-    IntProperty,
-    StringProperty,
-)
+
+# Blender のフレーム範囲は、通常の再生範囲が MINFRAME(0) 以上、
+# プレビュー範囲が MINAFRAME(-1048574) 以上と決まっている。
+# 負のプレビュー範囲も扱えるように、保存データの下限は MINAFRAME に合わせる。
+MIN_FRAME = -1048574
 
 
-def get_range() -> tuple[int, int]:
-    scene: Scene = bpy.context.scene # type: ignore
+def get_range(context: Context) -> tuple[int, int]:
+    scene: Scene = context.scene  # type: ignore
     if scene.use_preview_range:
         return (scene.frame_preview_start, scene.frame_preview_end)
     return (scene.frame_start, scene.frame_end)
 
 
-def set_range(start: int, end: int):
-    scene: Scene = bpy.context.scene # type: ignore
+def set_range(context: Context, start: int, end: int):
+    scene: Scene = context.scene  # type: ignore
     if scene.use_preview_range:
         scene.frame_preview_start = start
         scene.frame_preview_end = end
@@ -56,45 +59,52 @@ def set_range(start: int, end: int):
 
 
 from pathlib import Path
+
 LOCAL_HELP_PATH = Path(__file__).resolve().parent / "docs" / "index.html"
 
 
 class PLAYBACK_RANGES_PT_panel(Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    #bl_category = "Animation"
+    # bl_category = "Animation"
     bl_label = "Playback Ranges"
 
     @classmethod
     def poll(cls, context: Context) -> bool:
         return True
 
-    def draw_header(self, context: Context):
-        #preferences = context.preferences.addons[__name__].preferences
-        layout = self.layout
-        #if preferences.show_help_button:
-        #layout.operator(PLAYBACK_RANGES_OT_open_offline_help.bl_idname, icon="HELP", text="")
-
     def draw(self, context: Context):
-        scene: Scene = context.scene # type: ignore
-        layout: UILayout = self.layout # type: ignore
+        scene: Scene = context.scene  # type: ignore
+        layout: UILayout = self.layout  # type: ignore
 
         layout.operator(PLAYBACK_RANGES_OT_add.bl_idname, icon="ADD")
 
-        current_range = get_range()
-        for idx,x in enumerate(scene.playback_ranges_items): # type: ignore
+        current_range = get_range(context)
+        for idx, x in enumerate(scene.playback_ranges_items):  # type: ignore
             split = layout.split(align=True, factor=0.7)
             depress = (x.start, x.end) == current_range
-            op = split.operator(PLAYBACK_RANGES_OT_set_range.bl_idname, text=x.get_button_text(), depress=depress)
+            op = split.operator(
+                PLAYBACK_RANGES_OT_set_range.bl_idname,
+                text=x.get_button_text(),
+                depress=depress,
+            )
             op.start = x.start
-            op.end   = x.end
-            op = split.operator(PLAYBACK_RANGES_OT_edit_item.bl_idname, text="", icon="GREASEPENCIL")
+            op.end = x.end
+            op = split.operator(
+                PLAYBACK_RANGES_OT_edit_item.bl_idname, text="", icon="GREASEPENCIL"
+            )
             op.index = idx
-            op = split.operator(PLAYBACK_RANGES_OT_move_up.bl_idname, text="", icon="TRIA_UP")
+            op = split.operator(
+                PLAYBACK_RANGES_OT_move_up.bl_idname, text="", icon="TRIA_UP"
+            )
             op.index = idx
-            op = split.operator(PLAYBACK_RANGES_OT_move_down.bl_idname, text="", icon="TRIA_DOWN")
+            op = split.operator(
+                PLAYBACK_RANGES_OT_move_down.bl_idname, text="", icon="TRIA_DOWN"
+            )
             op.index = idx
-            op = split.operator(PLAYBACK_RANGES_OT_delete.bl_idname, text="", icon="TRASH")
+            op = split.operator(
+                PLAYBACK_RANGES_OT_delete.bl_idname, text="", icon="TRASH"
+            )
             op.index = idx
 
 
@@ -104,9 +114,9 @@ class PLAYBACK_RANGES_OT_add(Operator):
     bl_description = "Add Playback Range"
     bl_options = {"UNDO"}
 
-    name:  StringProperty(name="Name", default="Action")  # type: ignore
-    start: IntProperty(name="Start", default=0, min=0)  # type: ignore
-    end:   IntProperty(name="End", default=0, min=0)  # type: ignore
+    name: StringProperty(name="Name", default="Action")  # type: ignore
+    start: IntProperty(name="Start", default=0, min=MIN_FRAME)  # type: ignore
+    end: IntProperty(name="End", default=0, min=MIN_FRAME)  # type: ignore
 
     @classmethod
     def poll(cls, context: Context) -> bool:
@@ -114,14 +124,16 @@ class PLAYBACK_RANGES_OT_add(Operator):
 
     def execute(self, context: Context):
         if self.start > self.end:
-            self.report({"ERROR_INVALID_INPUT"}, "End must be grater than or equal to Start!")
+            self.report(
+                {"ERROR_INVALID_INPUT"}, "End must be greater than or equal to Start!"
+            )
             return {"CANCELLED"}
 
-        scene: Scene = context.scene # type: ignore
-        item = scene.playback_ranges_items.add() # type: ignore
-        item.name  = self.name
+        scene: Scene = context.scene  # type: ignore
+        item = scene.playback_ranges_items.add()  # type: ignore
+        item.name = self.name
         item.start = self.start
-        item.end   = self.end
+        item.end = self.end
 
         if context.area:
             context.area.tag_redraw()
@@ -129,17 +141,17 @@ class PLAYBACK_RANGES_OT_add(Operator):
         return {"FINISHED"}
 
     def invoke(self, context: Context, event: Event):
-        self.start, self.end = get_range()
-        wm: WindowManager = context.window_manager # type: ignore
+        self.start, self.end = get_range(context)
+        wm: WindowManager = context.window_manager  # type: ignore
         return wm.invoke_props_dialog(self, width=200)
 
     def draw(self, context: Context):
-        layout: UILayout = self.layout # type: ignore
+        layout: UILayout = self.layout  # type: ignore
         row = layout.row(align=True)
         row.alert = self.start > self.end
         row.prop(self, "start")
         row.prop(self, "end")
-        #layout.label(text=f"Range: {self.start}-{self.end}")
+        # layout.label(text=f"Range: {self.start}-{self.end}")
         layout.prop(self, "name")
 
 
@@ -153,16 +165,19 @@ class PLAYBACK_RANGES_OT_delete(Operator):
 
     @classmethod
     def poll(cls, context: Context) -> bool:
-        return True
+        return len(context.scene.playback_ranges_items) > 0  # type: ignore
 
     def execute(self, context: Context):
-        scene: Scene = context.scene # type: ignore
-        scene.playback_ranges_items.remove(self.index) # type: ignore
+        scene: Scene = context.scene  # type: ignore
+        items = scene.playback_ranges_items  # type: ignore
+        if self.index < 0 or self.index >= len(items):
+            return {"CANCELLED"}
+        items.remove(self.index)
 
         return {"FINISHED"}
 
     def invoke(self, context: Context, event: Event):
-        wm: WindowManager = context.window_manager # type: ignore
+        wm: WindowManager = context.window_manager  # type: ignore
         return wm.invoke_confirm(self, event)
 
 
@@ -181,11 +196,14 @@ class PLAYBACK_RANGES_OT_move_up(Operator):
         return True
 
     def execute(self, context: Context):
-        scene: Scene = context.scene # type: ignore
+        scene: Scene = context.scene  # type: ignore
+        items = scene.playback_ranges_items  # type: ignore
+        if self.index <= 0:
+            return {"CANCELLED"}
         if self.shift_key_down:
-            scene.playback_ranges_items.move(self.index, 0) # type: ignore
+            items.move(self.index, 0)
         else:
-            scene.playback_ranges_items.move(self.index, self.index-1) # type: ignore
+            items.move(self.index, self.index - 1)
 
         return {"FINISHED"}
 
@@ -209,11 +227,14 @@ class PLAYBACK_RANGES_OT_move_down(Operator):
         return True
 
     def execute(self, context: Context):
-        scene: Scene = context.scene # type: ignore
+        scene: Scene = context.scene  # type: ignore
+        items = scene.playback_ranges_items  # type: ignore
+        if self.index >= len(items) - 1:
+            return {"CANCELLED"}
         if self.shift_key_down:
-            scene.playback_ranges_items.move(self.index, len(scene.playback_ranges_items)-1) # type: ignore
+            items.move(self.index, len(items) - 1)
         else:
-            scene.playback_ranges_items.move(self.index, self.index+1) # type: ignore
+            items.move(self.index, self.index + 1)
 
         return {"FINISHED"}
 
@@ -232,21 +253,26 @@ class PLAYBACK_RANGES_OT_edit_item(Operator):
 
     index: IntProperty(name="Index", options={"HIDDEN"})  # type: ignore
 
-    name:  StringProperty(name="Name")  # type: ignore
-    start: IntProperty(name="Start", min=0)  # type: ignore
-    end:   IntProperty(name="End", min=0)  # type: ignore
+    name: StringProperty(name="Name")  # type: ignore
+    start: IntProperty(name="Start", min=MIN_FRAME)  # type: ignore
+    end: IntProperty(name="End", min=MIN_FRAME)  # type: ignore
 
     @classmethod
     def poll(cls, context: Context) -> bool:
-        return True
+        return len(context.scene.playback_ranges_items) > 0  # type: ignore
 
     def execute(self, context: Context):
         if self.start > self.end:
-            self.report({"ERROR_INVALID_INPUT"}, "End must be grater than or equal to Start!")
+            self.report(
+                {"ERROR_INVALID_INPUT"}, "End must be greater than or equal to Start!"
+            )
             return {"CANCELLED"}
 
-        scene: Scene = context.scene # type: ignore
-        item = scene.playback_ranges_items[self.index] # type: ignore
+        scene: Scene = context.scene  # type: ignore
+        items = scene.playback_ranges_items  # type: ignore
+        if self.index < 0 or self.index >= len(items):
+            return {"CANCELLED"}
+        item = items[self.index]
         item.name = self.name
         item.start = self.start
         item.end = self.end
@@ -259,16 +285,19 @@ class PLAYBACK_RANGES_OT_edit_item(Operator):
     def invoke(self, context: Context, event: Event):
         self.shift_key_down = event.shift
 
-        scene: Scene = context.scene # type: ignore
-        item = scene.playback_ranges_items[self.index] # type: ignore
-        self.name  = item.name
+        scene: Scene = context.scene  # type: ignore
+        items = scene.playback_ranges_items  # type: ignore
+        if self.index < 0 or self.index >= len(items):
+            return {"CANCELLED"}
+        item = items[self.index]
+        self.name = item.name
         self.start = item.start
-        self.end   = item.end
-        wm: WindowManager = context.window_manager # type: ignore
+        self.end = item.end
+        wm: WindowManager = context.window_manager  # type: ignore
         return wm.invoke_props_dialog(self, width=200)
 
     def draw(self, context: Context):
-        layout: UILayout = self.layout # type: ignore
+        layout: UILayout = self.layout  # type: ignore
         row = layout.row(align=True)
         row.alert = self.start > self.end
         row.prop(self, "start")
@@ -284,19 +313,20 @@ class PLAYBACK_RANGES_OT_set_range(Operator):
 
     shift_key_down = False
 
-    start: IntProperty(name="Start", default=-1)  # type: ignore
-    end:   IntProperty(name="End", default=-1)  # type: ignore
+    start: IntProperty(name="Start", default=MIN_FRAME - 1, options={"SKIP_SAVE"})  # type: ignore
+    end: IntProperty(name="End", default=MIN_FRAME - 1, options={"SKIP_SAVE"})  # type: ignore
 
     @classmethod
     def poll(cls, context: Context) -> bool:
         return True
 
     def execute(self, context: Context):
-        if self.start < 0 or self.end < 0:
+        # F3 から直接呼ばれたときは default のままなので、何もせずに終わる。
+        if self.start < MIN_FRAME or self.end < MIN_FRAME:
             return {"CANCELLED"}
 
-        scene: Scene = context.scene # type: ignore
-        set_range(self.start, self.end)
+        scene: Scene = context.scene  # type: ignore
+        set_range(context, self.start, self.end)
 
         if self.shift_key_down:
             scene.frame_current = self.start
@@ -326,14 +356,14 @@ class PLAYBACK_RANGES_OT_open_offline_help(Operator):
         return bpy.ops.wm.url_open(url=LOCAL_HELP_PATH.as_uri())
 
     def invoke(self, context: Context, event: Event):
-        wm: WindowManager = context.window_manager # type: ignore
+        wm: WindowManager = context.window_manager  # type: ignore
         return wm.invoke_confirm(self, event)
 
 
 class PlaybackRangeItem(PropertyGroup):
-    name:  StringProperty(name="Name", default="")  # type: ignore
-    start: IntProperty(name="Start", default=0, min=0)  # type: ignore
-    end:   IntProperty(name="End", default=0, min=0)  # type: ignore
+    name: StringProperty(name="Name", default="")  # type: ignore
+    start: IntProperty(name="Start", default=0, min=MIN_FRAME)  # type: ignore
+    end: IntProperty(name="End", default=0, min=MIN_FRAME)  # type: ignore
 
     def get_button_text(self) -> str:
         s = ""
@@ -349,28 +379,22 @@ class PlaybackRangeItem(PropertyGroup):
 class PLAYBACK_RANGES_Preferences(AddonPreferences):
     bl_idname = __name__
 
-    #show_help_button: BoolProperty(name="Show Help Button on Panel Header", default=True)  # type: ignore
-
     def draw(self, context: Context):
         layout = self.layout
-        #layout.prop(self, "show_help_button")
         layout.label(text="Location: 3D View > Side Bar > Misc > Playback Ranges")
 
 
 classes = (
-        PLAYBACK_RANGES_PT_panel,
-        PLAYBACK_RANGES_OT_set_range,
-        PLAYBACK_RANGES_OT_add,
-        PLAYBACK_RANGES_OT_delete,
-        PLAYBACK_RANGES_OT_move_up,
-        PLAYBACK_RANGES_OT_move_down,
-        PLAYBACK_RANGES_OT_edit_item,
-
-        PLAYBACK_RANGES_OT_open_offline_help,
-
-        PlaybackRangeItem,
-
-        PLAYBACK_RANGES_Preferences,
+    PLAYBACK_RANGES_PT_panel,
+    PLAYBACK_RANGES_OT_set_range,
+    PLAYBACK_RANGES_OT_add,
+    PLAYBACK_RANGES_OT_delete,
+    PLAYBACK_RANGES_OT_move_up,
+    PLAYBACK_RANGES_OT_move_down,
+    PLAYBACK_RANGES_OT_edit_item,
+    PLAYBACK_RANGES_OT_open_offline_help,
+    PlaybackRangeItem,
+    PLAYBACK_RANGES_Preferences,
 )
 
 
@@ -378,7 +402,8 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    Scene.playback_ranges_items = CollectionProperty(type=PlaybackRangeItem) # type: ignore
+    if not hasattr(Scene, "playback_ranges_items"):
+        Scene.playback_ranges_items = CollectionProperty(type=PlaybackRangeItem)  # type: ignore
 
 
 def unregister():
