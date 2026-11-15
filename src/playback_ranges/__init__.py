@@ -152,11 +152,14 @@ class PLAYBACK_RANGES_OT_delete(Operator):
 
     @classmethod
     def poll(cls, context: Context) -> bool:
-        return True
+        return len(context.scene.playback_ranges_items) > 0  # type: ignore
 
     def execute(self, context: Context):
-        scene: Scene = context.scene # type: ignore
-        scene.playback_ranges_items.remove(self.index) # type: ignore
+        scene: Scene = context.scene  # type: ignore
+        items = scene.playback_ranges_items  # type: ignore
+        if self.index < 0 or self.index >= len(items):
+            return {"CANCELLED"}
+        items.remove(self.index)
 
         return {"FINISHED"}
 
@@ -180,11 +183,14 @@ class PLAYBACK_RANGES_OT_move_up(Operator):
         return True
 
     def execute(self, context: Context):
-        scene: Scene = context.scene # type: ignore
+        scene: Scene = context.scene  # type: ignore
+        items = scene.playback_ranges_items  # type: ignore
+        if self.index <= 0:
+            return {"CANCELLED"}
         if self.shift_key_down:
-            scene.playback_ranges_items.move(self.index, 0) # type: ignore
+            items.move(self.index, 0)
         else:
-            scene.playback_ranges_items.move(self.index, self.index-1) # type: ignore
+            items.move(self.index, self.index - 1)
 
         return {"FINISHED"}
 
@@ -208,11 +214,14 @@ class PLAYBACK_RANGES_OT_move_down(Operator):
         return True
 
     def execute(self, context: Context):
-        scene: Scene = context.scene # type: ignore
+        scene: Scene = context.scene  # type: ignore
+        items = scene.playback_ranges_items  # type: ignore
+        if self.index >= len(items) - 1:
+            return {"CANCELLED"}
         if self.shift_key_down:
-            scene.playback_ranges_items.move(self.index, len(scene.playback_ranges_items)-1) # type: ignore
+            items.move(self.index, len(items) - 1)
         else:
-            scene.playback_ranges_items.move(self.index, self.index+1) # type: ignore
+            items.move(self.index, self.index + 1)
 
         return {"FINISHED"}
 
@@ -237,15 +246,18 @@ class PLAYBACK_RANGES_OT_edit_item(Operator):
 
     @classmethod
     def poll(cls, context: Context) -> bool:
-        return True
+        return len(context.scene.playback_ranges_items) > 0  # type: ignore
 
     def execute(self, context: Context):
         if self.start > self.end:
             self.report({"ERROR_INVALID_INPUT"}, "End must be grater than or equal to Start!")
             return {"CANCELLED"}
 
-        scene: Scene = context.scene # type: ignore
-        item = scene.playback_ranges_items[self.index] # type: ignore
+        scene: Scene = context.scene  # type: ignore
+        items = scene.playback_ranges_items  # type: ignore
+        if self.index < 0 or self.index >= len(items):
+            return {"CANCELLED"}
+        item = items[self.index]
         item.name = self.name
         item.start = self.start
         item.end = self.end
@@ -258,12 +270,15 @@ class PLAYBACK_RANGES_OT_edit_item(Operator):
     def invoke(self, context: Context, event: Event):
         self.shift_key_down = event.shift
 
-        scene: Scene = context.scene # type: ignore
-        item = scene.playback_ranges_items[self.index] # type: ignore
+        scene: Scene = context.scene  # type: ignore
+        items = scene.playback_ranges_items  # type: ignore
+        if self.index < 0 or self.index >= len(items):
+            return {"CANCELLED"}
+        item = items[self.index]
         self.name  = item.name
         self.start = item.start
         self.end   = item.end
-        wm: WindowManager = context.window_manager # type: ignore
+        wm: WindowManager = context.window_manager  # type: ignore
         return wm.invoke_props_dialog(self, width=200)
 
     def draw(self, context: Context):
