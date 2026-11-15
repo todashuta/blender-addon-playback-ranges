@@ -28,3 +28,12 @@ dependencies = [
 # Blender の bl_options はクラス属性として定義するのが API の作法で、実行時に書き換えない。
 # RUF012（mutable default）はこのパターンを誤検知するため無視する。
 ignore = ["RUF012"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

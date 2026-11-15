@@ -7,6 +7,7 @@ if "%1" == "" (
 	echo   make.bat build
 	echo   make.bat validate
 	echo   make.bat validate add-on-package.zip
+	echo   make.bat test
 	goto EOF
 )
 
@@ -28,6 +29,14 @@ if NOT "%1" == "" (
 		)
 	) else if "%1" == "validate" (
 		"%BLENDER_EXE%" --command extension validate %2
+		if errorlevel 1 (
+			goto ERR
+		) else (
+			goto EOF
+		)
+	) else if "%1" == "test" (
+		set "PLAYBACK_RANGES_SITE_PACKAGES=..\..\.venv\Lib\site-packages"
+		"%BLENDER_EXE%" --background --factory-startup --python ..\..\tests\run_in_blender.py
 		if errorlevel 1 (
 			goto ERR
 		) else (
