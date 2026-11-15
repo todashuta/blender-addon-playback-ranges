@@ -392,7 +392,8 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    Scene.playback_ranges_items = CollectionProperty(type=PlaybackRangeItem) # type: ignore
+    if not hasattr(Scene, "playback_ranges_items"):
+        Scene.playback_ranges_items = CollectionProperty(type=PlaybackRangeItem)  # type: ignore
 
 
 def unregister():
